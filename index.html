@@ -1255,6 +1255,59 @@ function checkEpisode6() {
         result.innerHTML += "<br>Keep trying! You need 16/20 to pass.";
     }
 }
+    function checkEpisode7() {
+    const answers = {
+        ep7q1: "B",
+        ep7q2: "C",
+        ep7q3: "A",
+        ep7q4: "C",
+        ep7q5: "D",
+        ep7q6: "A",
+        ep7q7: "B",
+        ep7q8: "C",
+        ep7q9: "B",
+        ep7q10: "D",
+        ep7q11: "A",
+        ep7q12: "B",
+        ep7q13: "B",
+        ep7q14: "B",
+        ep7q15: "C",
+        ep7q16: "A",
+        ep7q17: "B",
+        ep7q18: "A",
+        ep7q19: "A",
+        ep7q20: "B"
+    };
+
+    let score = 0;
+
+    for (const question in answers) {
+        const selected = document.querySelector(
+            'input[name="' + question + '"]:checked'
+        );
+
+        if (selected && selected.value === answers[question]) {
+            score++;
+        }
+    }
+
+    const result = document.getElementById("episode7-result");
+
+    result.innerHTML = "Your score: " + score + "/20";
+
+    if (score >= 16) {
+        result.innerHTML += "<br>🎉 Excellent! You passed Episode 7!";
+
+        const episode8 = document.getElementById("episode8");
+
+        if (episode8) {
+            episode8.style.display = "block";
+            result.innerHTML += "<br>Episode 8 is unlocked!";
+        }
+    } else {
+        result.innerHTML += "<br>❌ You need at least 16/20 to unlock Episode 8.";
+    }
+}
 </script> 
 </body>
 </html>
