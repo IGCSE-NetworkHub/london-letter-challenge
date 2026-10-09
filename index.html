@@ -1839,5 +1839,124 @@ function checkEpisode10() {
         result.innerHTML += "<br>❌ You need at least 16/20 to pass Episode 10.";
     }
 }</script> 
+    
+<script>
+(function () {
+    const STORAGE_KEY = "londonLetterChallengeProgressV1";
+
+    function getEpisodes() {
+        return Array.from(document.querySelectorAll(".episode"));
+    }
+
+    function saveProgress() {
+        const episodes = getEpisodes();
+
+        const progress = {
+            visibleEpisodes: episodes.map(function (episode) {
+                return getComputedStyle(episode).display !== "none";
+            }),
+            answers: [],
+            results: {},
+            scrollPosition: window.scrollY
+        };
+
+        episodes.forEach(function (episode, index) {
+            episode.querySelectorAll('input[type="radio"]:checked').forEach(function (input) {
+                progress.answers.push({
+                    episode: index,
+                    name: input.name,
+                    value: input.value
+                });
+            });
+        });
+
+        document.querySelectorAll('[id*="result" i]').forEach(function (element) {
+            if (element.id) {
+                progress.results[element.id] = element.innerHTML;
+            }
+        });
+
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+        } catch (error) {
+            console.warn("Progress could not be saved.", error);
+        }
+    }
+
+    function restoreProgress() {
+        let progress;
+
+        try {
+            progress = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        } catch (error) {
+            return;
+        }
+
+        if (!progress) return;
+
+        const episodes = getEpisodes();
+
+        if (Array.isArray(progress.visibleEpisodes)) {
+            episodes.forEach(function (episode, index) {
+                if (progress.visibleEpisodes[index]) {
+                    episode.style.display = "block";
+                } else {
+                    episode.style.display = "none";
+                }
+            });
+        }
+
+        if (Array.isArray(progress.answers)) {
+            progress.answers.forEach(function (answer) {
+                const episode = episodes[answer.episode];
+                if (!episode) return;
+
+                const inputs = episode.querySelectorAll('input[type="radio"]');
+
+                inputs.forEach(function (input) {
+                    if (
+                        input.name === answer.name &&
+                        input.value === answer.value
+                    ) {
+                        input.checked = true;
+                    }
+                });
+            });
+        }
+
+        if (progress.results) {
+            Object.keys(progress.results).forEach(function (id) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = progress.results[id];
+                }
+            });
+        }
+
+        if (typeof progress.scrollPosition === "number") {
+            setTimeout(function () {
+                window.scrollTo(0, progress.scrollPosition);
+            }, 300);
+        }
+    }
+
+    document.addEventListener("click", function () {
+        setTimeout(saveProgress, 100);
+    });
+
+    document.addEventListener("change", function () {
+        saveProgress();
+    });
+
+    window.addEventListener("scroll", function () {
+        saveProgress();
+    });
+
+    window.addEventListener("beforeunload", saveProgress);
+
+    restoreProgress();
+})();
+</script>
+
 </body>
 </html>
